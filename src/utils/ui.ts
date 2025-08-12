@@ -3,8 +3,6 @@ import boxen from 'boxen';
 import ora from 'ora';
 import gradient from 'gradient-string';
 
-// Centralized terminal UI helpers for a consistent look & feel
-
 export const divider = (width: number = process.stdout.columns || 60): string => {
   return chalk.gray('─'.repeat(Math.max(20, Math.min(width, 80))));
 };

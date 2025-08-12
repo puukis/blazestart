@@ -4,11 +4,9 @@ import { LANGUAGES, FRAMEWORKS, LICENSES, PACKAGE_MANAGERS } from '../config/tem
 export async function listTemplates(): Promise<void> {
   console.clear();
 
-  // Header
   console.log(chalk.cyan.bold('BlazeStart Templates & Frameworks'));
   console.log(chalk.gray(''.padEnd(50, '—')));
   
-  // Languages section
   console.log(chalk.yellow.bold('\nSUPPORTED LANGUAGES\n'));
   console.log(chalk.gray('──────────────────────────────────────────'));
   
@@ -21,11 +19,9 @@ export async function listTemplates(): Promise<void> {
   }
   languageRows.forEach(row => console.log('  ' + row));
   
-  // Frameworks by language
   console.log(chalk.yellow.bold('\nFRAMEWORKS BY LANGUAGE\n'));
   console.log(chalk.gray('──────────────────────────────────────────'));
   
-  // Group frameworks by language
   const frameworksByLanguage: Record<string, typeof FRAMEWORKS> = {};
   
   LANGUAGES.forEach(lang => {
@@ -35,7 +31,6 @@ export async function listTemplates(): Promise<void> {
     }
   });
   
-  // Display frameworks grouped by language
   Object.entries(frameworksByLanguage).forEach(([langId, frameworks]) => {
     const lang = LANGUAGES.find(l => l.id === langId);
     if (!lang) return;
@@ -48,7 +43,6 @@ export async function listTemplates(): Promise<void> {
     });
   });
   
-  // Package managers section
   console.log(chalk.yellow.bold('\nPACKAGE MANAGERS\n'));
   console.log(chalk.gray('──────────────────────────────────────────'));
   
@@ -69,7 +63,6 @@ export async function listTemplates(): Promise<void> {
     console.log(`  ${chalk.white(lang.name.padEnd(12))} ${chalk.gray('->')} ${pmList}`);
   });
   
-  // Licenses section
   console.log(chalk.yellow.bold('\nAVAILABLE LICENSES\n'));
   console.log(chalk.gray('──────────────────────────────────────────'));
   
@@ -82,7 +75,6 @@ export async function listTemplates(): Promise<void> {
   }
   licenseRows.forEach(row => console.log('  ' + row));
   
-  // Features section
   console.log(chalk.yellow.bold('\nADDITIONAL FEATURES\n'));
   console.log(chalk.gray('──────────────────────────────────────────'));
   
@@ -101,7 +93,6 @@ export async function listTemplates(): Promise<void> {
     console.log('  ' + chalk.white('•') + ' ' + feature);
   });
   
-  // Usage examples
   console.log(chalk.yellow.bold('\nUSAGE EXAMPLES\n'));
   console.log(chalk.gray('──────────────────────────────────────────'));
   
@@ -137,7 +128,6 @@ export async function listTemplates(): Promise<void> {
     console.log(`    ${chalk.gray(ex.desc)}\n`);
   });
 
-  // Footer
   console.log(chalk.gray(''.padEnd(50, '—')));
   console.log(chalk.white('Run: ') + chalk.green('blazestart create') + chalk.white(' to begin'));
 }

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 
 import { Command } from 'commander';
 import { createCommand } from './commands/create';
@@ -9,7 +8,6 @@ import * as packageJson from '../package.json';
 
 const version = packageJson.version || '1.0.0';
 
-// Polished splash screen using UI helpers
 async function showSplashScreen(): Promise<void> {
   console.clear();
   const title = 'BlazeStart';
@@ -17,7 +15,6 @@ async function showSplashScreen(): Promise<void> {
   printHeader(title, subtitle);
 }
 
-// Main program
 const program = new Command();
 
 program
@@ -25,13 +22,11 @@ program
   .description('Slash project setup time to seconds')
   .version(version)
   .hook('preAction', async () => {
-    // Show splash screen only for main commands
     if (process.argv.length === 2 || process.argv[2] === 'create') {
       await showSplashScreen();
     }
   });
 
-// Create command - main functionality
 program
   .command('create [project-name]')
   .alias('new')
@@ -47,7 +42,6 @@ program
   .option('--config <profile>', 'Use a saved configuration profile')
   .action(createCommand);
 
-// Init command - initialize in current directory
 program
   .command('init')
   .description('Initialize a project in the current directory')
@@ -56,7 +50,6 @@ program
   .option('--license <license>', 'License type')
   .action(initCommand);
 
-// Config command - manage saved configurations
 program
   .command('config <action>')
   .description('Manage saved configuration profiles')
@@ -64,7 +57,6 @@ program
   .option('-s, --set <key=value>', 'Set a configuration value')
   .action(configCommand);
 
-// List command - show available templates
 program
   .command('list')
   .alias('ls')
@@ -74,7 +66,6 @@ program
     await listTemplates();
   });
 
-// Fork command - fork and customize existing repos
 program
   .command('fork <repo-url>')
   .description('Fork and customize an existing repository')
@@ -85,10 +76,8 @@ program
     await forkCommand(repoUrl, options);
   });
 
-// Parse arguments
 program.parse(process.argv);
 
-// Show help if no arguments
 if (!process.argv.slice(2).length) {
   showSplashScreen().then(() => {
     program.outputHelp();

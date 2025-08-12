@@ -70,7 +70,6 @@ export async function configCommand(action: string, options?: any): Promise<void
   }
 }
 
-// List all saved profiles
 async function listConfigProfiles(): Promise<void> {
   const spinner = ora('Loading profiles...').start();
   
@@ -100,7 +99,6 @@ async function listConfigProfiles(): Promise<void> {
   }
 }
 
-// Save a new profile
 async function saveConfigProfile(options?: any): Promise<void> {
   const answers = await inquirer.prompt([
     {
@@ -233,7 +231,6 @@ async function saveConfigProfile(options?: any): Promise<void> {
   }
 }
 
-// Use/set a profile as default
 async function useConfigProfile(options?: any): Promise<void> {
   const profiles = await listProfiles();
   
@@ -257,7 +254,6 @@ async function useConfigProfile(options?: any): Promise<void> {
   const spinner = ora(`Setting "${profileName}" as default...`).start();
   
   try {
-    // Check if profile exists
     await loadProfile(profileName);
     
     const config = await getConfig();
@@ -271,7 +267,6 @@ async function useConfigProfile(options?: any): Promise<void> {
   }
 }
 
-// Remove a profile
 async function removeConfigProfile(options?: any): Promise<void> {
   const profiles = await listProfiles();
   
@@ -306,8 +301,7 @@ async function removeConfigProfile(options?: any): Promise<void> {
   
   try {
     await deleteProfile(profileName);
-    
-    // If it was the default, clear it
+
     const config = await getConfig();
     if (config.defaultProfile === profileName) {
       config.defaultProfile = undefined;
@@ -321,7 +315,6 @@ async function removeConfigProfile(options?: any): Promise<void> {
   }
 }
 
-// Show profile details
 async function showConfigProfile(options?: any): Promise<void> {
   const profiles = await listProfiles();
   
@@ -370,7 +363,6 @@ async function showConfigProfile(options?: any): Promise<void> {
   }
 }
 
-// Set a configuration option
 async function setConfigOption(options?: any): Promise<void> {
   const answers = await inquirer.prompt([
     {
@@ -398,12 +390,11 @@ async function setConfigOption(options?: any): Promise<void> {
     key = answers.key;
     value = answers.value;
   }
-  
-  // Try to parse value as JSON
+
   try {
     value = JSON.parse(value);
   } catch {
-    // Keep as string if not valid JSON
+
   }
   
   const spinner = ora(`Setting ${key}...`).start();
@@ -417,7 +408,6 @@ async function setConfigOption(options?: any): Promise<void> {
   }
 }
 
-// Get a configuration option
 async function getConfigOption(options?: any): Promise<void> {
   const answers = await inquirer.prompt([
     {
@@ -445,7 +435,6 @@ async function getConfigOption(options?: any): Promise<void> {
   }
 }
 
-// Export a profile
 async function exportConfigProfile(options?: any): Promise<void> {
   const profiles = await listProfiles();
   
@@ -483,7 +472,6 @@ async function exportConfigProfile(options?: any): Promise<void> {
   }
 }
 
-// Import a profile
 async function importConfigProfile(options?: any): Promise<void> {
   const answers = await inquirer.prompt([
     {
@@ -520,7 +508,6 @@ async function importConfigProfile(options?: any): Promise<void> {
   }
 }
 
-// Show help for config command
 function showConfigHelp(): void {
   console.log(chalk.cyan('\n📋 Configuration Management Commands:\n'));
   console.log('  ' + chalk.white('blazestart config list') + chalk.gray('         - List all saved profiles'));

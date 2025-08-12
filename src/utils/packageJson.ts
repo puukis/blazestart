@@ -28,7 +28,6 @@ export async function generatePackageJson(
     license: 'MIT'
   };
 
-  // Set main entry point
   if (language === 'typescript') {
     packageJson.main = 'dist/index.js';
     packageJson.scripts.build = 'tsc';
@@ -41,11 +40,9 @@ export async function generatePackageJson(
     packageJson.scripts.dev = 'nodemon src/index.js';
   }
 
-  // Add framework-specific dependencies and scripts
   const deps: Record<string, string> = {};
   const devDeps: Record<string, string> = {};
 
-  // Framework dependencies
   switch (framework) {
     case 'express':
       deps.express = '^4.18.2';
@@ -184,7 +181,6 @@ export async function generatePackageJson(
       break;
   }
 
-  // TypeScript dependencies
   if (language === 'typescript') {
     devDeps.typescript = '^5.3.0';
     devDeps['@types/node'] = '^20.10.0';
@@ -201,11 +197,9 @@ export async function generatePackageJson(
       devDeps['@types/react-dom'] = '^18.2.0';
     }
   } else {
-    // JavaScript dev dependencies
     devDeps.nodemon = '^3.0.0';
   }
 
-  // Linter dependencies
   if (linters.includes('eslint')) {
     devDeps.eslint = '^8.55.0';
     packageJson.scripts.lint = 'eslint .';
@@ -235,10 +229,8 @@ export async function generatePackageJson(
     }
   }
 
-  // Add test script
   packageJson.scripts.test = 'echo "Error: no test specified" && exit 1';
 
-  // Set dependencies
   if (Object.keys(deps).length > 0) {
     packageJson.dependencies = deps;
   }
@@ -247,7 +239,6 @@ export async function generatePackageJson(
     packageJson.devDependencies = devDeps;
   }
 
-  // Set module type for ESM
   if (framework === 'vue' || framework === 'svelte' || framework === 'vite') {
     packageJson.type = 'module';
   }

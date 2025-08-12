@@ -23,37 +23,28 @@ interface ProjectOptions {
 }
 
 export async function generateProject(projectPath: string, options: ProjectOptions): Promise<void> {
-  // Create main project structure
   await createProjectStructure(projectPath, options);
   
-  // Generate .gitignore
   if (options.gitignore) {
     await generateGitignore(projectPath, options.language);
   }
   
-  // Generate LICENSE
   if (options.license !== 'none') {
     await generateLicenseFile(projectPath, options.license);
   }
   
-  // Generate README
   await generateReadmeFile(projectPath, options);
-  
-  // Generate package.json or equivalent
+
   await generateProjectManifest(projectPath, options);
-  
-  // Generate main entry file
+
   await generateEntryFile(projectPath, options);
-  
-  // Generate config files
+
   await generateConfigFiles(projectPath, options);
-  
-  // Setup linters
+
   if (options.linters.length > 0) {
     await setupLinters(projectPath, options);
   }
-  
-  // Setup git hooks
+
   if (options.gitHooks) {
     await setupGitHooks(projectPath, options);
   }
@@ -61,11 +52,9 @@ export async function generateProject(projectPath: string, options: ProjectOptio
 
 async function createProjectStructure(projectPath: string, options: ProjectOptions): Promise<void> {
   const { language, framework } = options;
-  
-  // Create basic directory structure
+
   const directories = ['src', 'tests', 'docs'];
-  
-  // Add framework-specific directories
+
   if (framework === 'react' || framework === 'next' || framework === 'vue') {
     directories.push('src/components', 'src/pages', 'src/styles', 'public');
   }
@@ -77,8 +66,7 @@ async function createProjectStructure(projectPath: string, options: ProjectOptio
   if (language === 'python') {
     directories.push('src/utils', 'requirements');
   }
-  
-  // Create all directories
+
   for (const dir of directories) {
     await fs.ensureDir(path.join(projectPath, dir));
   }
@@ -112,19 +100,15 @@ async function generateProjectManifest(projectPath: string, options: ProjectOpti
       JSON.stringify(packageJson, null, 2)
     );
   } else if (language === 'python') {
-    // Generate requirements.txt or pyproject.toml
     const requirements = generatePythonRequirements(framework);
     await fs.writeFile(path.join(projectPath, 'requirements.txt'), requirements);
     
-    // Generate pyproject.toml for modern Python projects
     const pyprojectContent = generatePyProjectToml(name, framework);
     await fs.writeFile(path.join(projectPath, 'pyproject.toml'), pyprojectContent);
   } else if (language === 'go') {
-    // Generate go.mod
     const goModContent = `module ${name}\n\ngo 1.21\n`;
     await fs.writeFile(path.join(projectPath, 'go.mod'), goModContent);
   } else if (language === 'rust') {
-    // Generate Cargo.toml
     const cargoToml = generateCargoToml(name, framework);
     await fs.writeFile(path.join(projectPath, 'Cargo.toml'), cargoToml);
   }
@@ -158,7 +142,6 @@ async function generateConfigFiles(projectPath: string, options: ProjectOptions)
   const { language, framework } = options;
   
   if (language === 'typescript') {
-    // Generate tsconfig.json
     const tsConfig = {
       compilerOptions: {
         target: 'ES2020',
@@ -182,7 +165,6 @@ async function generateConfigFiles(projectPath: string, options: ProjectOptions)
     );
   }
   
-  // Add framework-specific configs
   if (framework === 'next') {
     const nextConfig = `/** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -253,7 +235,6 @@ async function setupGitHooks(projectPath: string, options: ProjectOptions): Prom
   const { language } = options;
   
   if (language === 'javascript' || language === 'typescript') {
-    // Add husky configuration
     const huskyConfig = {
       hooks: {
         'pre-commit': 'npm run lint',
@@ -265,7 +246,6 @@ async function setupGitHooks(projectPath: string, options: ProjectOptions): Prom
       JSON.stringify(huskyConfig, null, 2)
     );
   } else if (language === 'python') {
-    // Add pre-commit configuration
     const preCommitConfig = `repos:
   - repo: https://github.com/psf/black
     rev: 23.3.0
@@ -279,7 +259,6 @@ async function setupGitHooks(projectPath: string, options: ProjectOptions): Prom
   }
 }
 
-// Helper functions for generating language-specific content
 function generateJSEntryFile(framework: string, language: string): string {
   const importStatement = language === 'typescript' 
     ? "import express from 'express';" 

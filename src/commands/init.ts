@@ -16,7 +16,6 @@ export async function initCommand(options?: any): Promise<void> {
     const currentDir = process.cwd();
     const dirName = path.basename(currentDir);
     
-    // Check if directory is empty
     const files = await fs.readdir(currentDir);
     const isEmpty = files.length === 0 || 
                    (files.length === 1 && files[0] === '.git');
@@ -39,7 +38,6 @@ export async function initCommand(options?: any): Promise<void> {
     
     console.log(chalk.cyan(`\n📂 Initializing project in: ${currentDir}\n`));
     
-    // Silently load default profile to prefill defaults (if configured)
     let profile: any = {};
     try {
       const appConfig = await getConfig();
@@ -48,11 +46,10 @@ export async function initCommand(options?: any): Promise<void> {
         console.log(chalk.cyan(`📋 Loaded default profile: ${appConfig.defaultProfile}`));
       }
     } catch {
-      // ignore
+
     }
     const profileActive = Object.keys(profile).length > 0;
 
-    // Interactive wizard
     const answers = await inquirer.prompt([
       {
         type: 'list',
@@ -159,7 +156,6 @@ export async function initCommand(options?: any): Promise<void> {
       }
     ]);
     
-    // Prepare project options
     const projectOptions = {
       name: dirName,
       language: options?.language || profile.language || answers.language,
@@ -176,12 +172,10 @@ export async function initCommand(options?: any): Promise<void> {
       installDeps: profile.installDeps !== undefined ? profile.installDeps : (answers.installDeps || false)
     };
     
-    // Generate project files
     const spinner = ora('🔥 Generating project files...').start();
     await generateProject(currentDir, projectOptions);
     spinner.succeed(chalk.green('Project files generated'));
     
-    // Initialize Git
     if (projectOptions.git) {
       const gitSpinner = ora('🔀 Initializing Git repository...').start();
       const git = simpleGit(currentDir);
@@ -191,11 +185,9 @@ export async function initCommand(options?: any): Promise<void> {
       gitSpinner.succeed(chalk.green('Git repository initialized'));
     }
     
-    // Create remote repository (if requested)
     if (projectOptions.git && projectOptions.remoteRepo) {
       const remoteSpinner = ora('🌐 Creating GitHub repository...').start();
       try {
-        // Ensure gh is installed and authenticated
         execSync('gh --version', { stdio: 'ignore' });
         execSync('gh auth status -h github.com', { stdio: 'ignore' });
 
@@ -217,7 +209,6 @@ export async function initCommand(options?: any): Promise<void> {
       }
     }
     
-    // Install dependencies
     if (projectOptions.installDeps && ['javascript', 'typescript'].includes(projectOptions.language)) {
       const installSpinner = ora(`📦 Installing dependencies with ${projectOptions.packageManager}...`).start();
       
@@ -232,7 +223,6 @@ export async function initCommand(options?: any): Promise<void> {
       installSpinner.succeed(chalk.green('Dependencies installed'));
     }
     
-    // Success message (professional boxed style)
     console.log('\n' + boxed('🎉 Project initialized successfully!', 'Success'));
     
     console.log(chalk.cyan('\n🚀 Get started with:'));

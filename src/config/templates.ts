@@ -44,7 +44,6 @@ export const LANGUAGES: Language[] = [
 ];
 
 export const FRAMEWORKS: Framework[] = [
-  // JavaScript/TypeScript Frameworks
   { id: 'react', name: 'React', icon: '', languages: ['javascript', 'typescript'], description: 'A JavaScript library for building user interfaces' },
   { id: 'next', name: 'Next.js', icon: '', languages: ['javascript', 'typescript'], description: 'The React framework for production' },
   { id: 'vue', name: 'Vue.js', icon: '', languages: ['javascript', 'typescript'], description: 'The progressive JavaScript framework' },
@@ -60,32 +59,25 @@ export const FRAMEWORKS: Framework[] = [
   { id: 'astro', name: 'Astro', icon: '', languages: ['javascript', 'typescript'], description: 'Build faster websites with less client-side JavaScript' },
   { id: 'vite', name: 'Vite', icon: '', languages: ['javascript', 'typescript'], description: 'Next generation frontend tooling' },
   
-  // Python Frameworks
   { id: 'flask', name: 'Flask', icon: '', languages: ['python'], description: 'Lightweight WSGI web application framework' },
   { id: 'django', name: 'Django', icon: '', languages: ['python'], description: 'High-level Python web framework' },
   { id: 'fastapi', name: 'FastAPI', icon: '', languages: ['python'], description: 'Modern, fast web framework for building APIs' },
   { id: 'pyramid', name: 'Pyramid', icon: '', languages: ['python'], description: 'Python web framework' },
   
-  // Go Frameworks
   { id: 'gin', name: 'Gin', icon: '', languages: ['go'], description: 'HTTP web framework written in Go' },
   { id: 'echo', name: 'Echo', icon: '', languages: ['go'], description: 'High performance, minimalist Go web framework' },
   { id: 'fiber', name: 'Fiber', icon: '', languages: ['go'], description: 'Express-inspired web framework written in Go' },
-  
-  // Rust Frameworks
   { id: 'actix', name: 'Actix', icon: '🦀', languages: ['rust'], description: 'Powerful, pragmatic, and extremely fast web framework' },
   { id: 'rocket', name: 'Rocket', icon: '🚀', languages: ['rust'], description: 'Web framework for Rust' },
   { id: 'axum', name: 'Axum', icon: '⚡', languages: ['rust'], description: 'Ergonomic and modular web framework' },
   
-  // Ruby Frameworks
   { id: 'rails', name: 'Ruby on Rails', icon: '🛤️', languages: ['ruby'], description: 'Full-stack web application framework' },
   { id: 'sinatra', name: 'Sinatra', icon: '🎤', languages: ['ruby'], description: 'DSL for quickly creating web applications' },
   
-  // PHP Frameworks
   { id: 'laravel', name: 'Laravel', icon: '🔴', languages: ['php'], description: 'The PHP framework for web artisans' },
   { id: 'symfony', name: 'Symfony', icon: '', languages: ['php'], description: 'High performance PHP framework' },
   { id: 'slim', name: 'Slim', icon: '', languages: ['php'], description: 'PHP micro framework' },
   
-  // C# Frameworks
   { id: 'aspnet', name: 'ASP.NET Core', icon: '', languages: ['csharp'], description: 'Cross-platform framework for building modern apps' },
   { id: 'blazor', name: 'Blazor', icon: '', languages: ['csharp'], description: 'Build interactive web UIs using C#' },
 ];
@@ -114,7 +106,6 @@ export const PACKAGE_MANAGERS: PackageManager[] = [
   { id: 'nuget', name: 'NuGet', icon: '', languages: ['csharp'], lockFile: 'packages.lock.json' },
 ];
 
-// Template file paths for different combinations
 export const TEMPLATE_PATHS: Record<string, string> = {
   'javascript-none': 'vanilla-js',
   'typescript-none': 'vanilla-ts',
@@ -146,7 +137,6 @@ export const TEMPLATE_PATHS: Record<string, string> = {
   'csharp-aspnet': 'aspnet',
 };
 
-// .gitignore templates for different languages
 export const GITIGNORE_TEMPLATES: Record<string, string[]> = {
   javascript: [
     'node_modules/',

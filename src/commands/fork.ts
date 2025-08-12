@@ -1,12 +1,10 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-// Use unified spinner styling
 import { makeSpinner, boxed } from '../utils/ui';
 import path from 'path';
 import fs from 'fs-extra';
 import { simpleGit, SimpleGitProgressEvent } from 'simple-git';
 import { execSync } from 'child_process';
-// removed gradient banner in favor of boxed UI
 
 interface ForkOptions {
   name?: string;
@@ -15,11 +13,10 @@ interface ForkOptions {
 
 export async function forkCommand(repoUrl: string, options?: ForkOptions): Promise<void> {
   try {
-    // Preparing & validate repo URL
     const prepSpinner = makeSpinner('🔧 Preparing fork...').start();
     const isValidUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(repoUrl) ||
                       /^git@[\w\.-]+:[\w\/-]+\.git$/.test(repoUrl) ||
-                      /^[\w-]+\/[\w-]+$/.test(repoUrl); // GitHub shorthand
+                      /^[\w-]+\/[\w-]+$/.test(repoUrl);
     
     if (!isValidUrl) {
       prepSpinner.fail(chalk.red('❌ Invalid repository URL'));
@@ -30,18 +27,15 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       return;
     }
     
-    // Convert GitHub shorthand to full URL
     let fullRepoUrl = repoUrl;
     if (/^[\w-]+\/[\w-]+$/.test(repoUrl)) {
       fullRepoUrl = `https://github.com/${repoUrl}.git`;
     }
     
-    // Extract repo name from URL
     const repoNameMatch = fullRepoUrl.match(/\/([^\/]+?)(\.git)?$/);
     const defaultName = repoNameMatch ? repoNameMatch[1] : 'forked-project';
     prepSpinner.succeed(chalk.green('Preparation complete'));
     
-    // Interactive prompts
     const answers = await inquirer.prompt([
       {
         type: 'input',
@@ -111,7 +105,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
     const projectName = options?.name || answers.name;
     const projectPath = path.join(process.cwd(), projectName);
     
-    // Check if directory exists
     if (await fs.pathExists(projectPath)) {
       const overwrite = await inquirer.prompt([
         {
@@ -130,7 +123,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       await fs.remove(projectPath);
     }
     
-    // Clone repository with progress
     const cloneSpinner = makeSpinner(`🍴 Forking repository from ${chalk.cyan(repoUrl)} (this may take a minute)...`).start();
     try {
       const git = simpleGit({
@@ -147,15 +139,12 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       return;
     }
     
-    // Clean git history if requested
     if (options?.clean || answers.clean) {
       const cleanSpinner = makeSpinner('🧹 Cleaning git history...').start();
       
       try {
-        // Remove .git directory
         await fs.remove(path.join(projectPath, '.git'));
         
-        // Initialize new git repo
         const git = simpleGit(projectPath);
         await git.init();
         
@@ -165,7 +154,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       }
     }
     
-    // Update README if requested
     if (answers.updateReadme) {
       const readmePath = path.join(projectPath, 'README.md');
       
@@ -175,13 +163,10 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
         try {
           let readmeContent = await fs.readFile(readmePath, 'utf-8');
           
-          // Update title (first line that starts with #)
           readmeContent = readmeContent.replace(/^#\s+.+$/m, `# ${projectName}`);
           
-          // Add fork notice
           const forkNotice = `\n> 🍴 Forked from [${fullRepoUrl}](${fullRepoUrl}) using [BlazeStart](https://github.com/blazestart/blazestart)\n`;
           
-          // Insert after title
           const lines = readmeContent.split('\n');
           const titleIndex = lines.findIndex(line => line.startsWith('#'));
           if (titleIndex !== -1) {
@@ -189,9 +174,7 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
             readmeContent = lines.join('\n');
           }
           
-          // Update description if provided
           if (answers.description) {
-            // Look for description after title
             const descriptionRegex = /^#\s+.+\n\n(.+)$/m;
             if (descriptionRegex.test(readmeContent)) {
               readmeContent = readmeContent.replace(descriptionRegex, `# ${projectName}\n\n${answers.description}`);
@@ -206,7 +189,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       }
     }
     
-    // Update package.json if exists
     if (answers.updatePackageJson) {
       const packageJsonPath = path.join(projectPath, 'package.json');
       
@@ -223,10 +205,8 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
             packageJson.description = answers.description;
           }
           
-          // Remove repository field to avoid confusion
           delete packageJson.repository;
           
-          // Update author if possible
           packageJson.author = packageJson.author || '';
           
           await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
@@ -237,12 +217,10 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       }
     }
     
-    // Update license if requested
     if (answers.license !== 'keep') {
       const licenseSpinner = makeSpinner('📜 Updating license...').start();
       
       try {
-        // Remove existing license files
         const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'LICENCE'];
         for (const file of licenseFiles) {
           const licensePath = path.join(projectPath, file);
@@ -251,10 +229,7 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
           }
         }
         
-        // Add new license if not 'none'
         if (answers.license !== 'none') {
-          // This would ideally fetch the license template
-          // For now, we'll just create a placeholder
           const licensePath = path.join(projectPath, 'LICENSE');
           await fs.writeFile(licensePath, `${answers.license.toUpperCase()} License\n\nCopyright (c) ${new Date().getFullYear()}\n`);
         }
@@ -265,7 +240,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       }
     }
     
-    // Commit changes if git was cleaned
     if (options?.clean || answers.clean) {
       const commitSpinner = makeSpinner('💾 Creating initial commit...').start();
       
@@ -279,7 +253,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       }
     }
     
-    // Install dependencies
     if (answers.installDeps) {
       const packageJsonPath = path.join(projectPath, 'package.json');
       
@@ -287,7 +260,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
         const installSpinner = makeSpinner('📦 Installing dependencies...').start();
         
         try {
-          // Detect package manager
           let installCmd = 'npm install';
           
           if (await fs.pathExists(path.join(projectPath, 'yarn.lock'))) {
@@ -304,7 +276,6 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       }
     }
     
-    // Open in VS Code
     if (answers.openInVSCode) {
       try {
         execSync(`code ${projectPath}`, { stdio: 'ignore' });
@@ -314,14 +285,12 @@ export async function forkCommand(repoUrl: string, options?: ForkOptions): Promi
       }
     }
     
-    // Success message (professional boxed style)
     console.log('\n' + boxed('🍴 Repository forked successfully!', 'Success'));
     
     console.log(chalk.cyan('\n📂 Project location:'), chalk.white(projectPath));
     console.log(chalk.cyan('🚀 Get started with:'));
     console.log(chalk.gray(`   cd ${projectName}`));
     
-    // Show relevant commands based on project type
     const hasPackageJson = await fs.pathExists(path.join(projectPath, 'package.json'));
     const hasCargoToml = await fs.pathExists(path.join(projectPath, 'Cargo.toml'));
     const hasGoMod = await fs.pathExists(path.join(projectPath, 'go.mod'));

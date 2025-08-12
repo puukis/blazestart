@@ -124,8 +124,6 @@ See LICENSE file for details.`;
 }
 
 function generateAIReadme(name: string, language: string, framework: string): string {
-  // This would integrate with an AI service to generate contextual README
-  // For now, returning an enhanced version
   return `# ${name} 🚀
 
 > An intelligent ${framework !== 'none' ? framework : language} application built for modern development
@@ -219,8 +217,7 @@ Licensed under the terms specified in the LICENSE file.
 
 function generateBadges(name: string, language: string, framework: string, license: string): string {
   const badges = [];
-  
-  // Language badge
+
   const langColors: Record<string, string> = {
     javascript: 'F7DF1E',
     typescript: '3178C6',
@@ -233,16 +230,13 @@ function generateBadges(name: string, language: string, framework: string, licen
   };
   
   badges.push(`![${language}](https://img.shields.io/badge/${language}-${langColors[language] || '000000'}?style=for-the-badge&logo=${language}&logoColor=white)`);
-  
-  // Framework badge if applicable
+
   if (framework !== 'none') {
     badges.push(`![${framework}](https://img.shields.io/badge/${framework}-000000?style=for-the-badge&logo=${framework}&logoColor=white)`);
   }
-  
-  // License badge
+
   badges.push(`![License](https://img.shields.io/badge/license-${license}-blue?style=for-the-badge)`);
-  
-  // Build status badge
+
   badges.push(`![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)`);
   
   return badges.join(' ');

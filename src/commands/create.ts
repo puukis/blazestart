@@ -28,13 +28,11 @@ interface ProjectOptions {
 
 export async function createCommand(projectName?: string, options?: any): Promise<void> {
   try {
-    // Load profile if specified or prompt to select one
     let config: Partial<ProjectOptions> = {};
     if (options?.config) {
       config = await loadProfile(options.config);
       console.log(chalk.cyan(`📋 Loaded profile: ${options.config}`));
     } else {
-      // Silently load default profile if configured
       try {
         const appConfig = await getConfig();
         if (appConfig.defaultProfile) {
@@ -42,13 +40,12 @@ export async function createCommand(projectName?: string, options?: any): Promis
           console.log(chalk.cyan(`📋 Loaded default profile: ${appConfig.defaultProfile}`));
         }
       } catch {
-        // ignore
+
       }
     }
 
     const profileActive = Object.keys(config).length > 0;
 
-    // Interactive wizard
     const answers = await inquirer.prompt([
       {
         type: 'input',
@@ -73,7 +70,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
         when: (ans: any) => ans.useCustomPath,
         validate: async (input: string) => {
           if (!input || !input.trim()) return 'Please enter a path';
-          // Basic sanity check; actual resolution happens later
           return true;
         }
       },
@@ -194,7 +190,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
       }
     ]);
 
-    // Merge all options
     const projectOptions: ProjectOptions = {
       name: answers.name || projectName,
       language: options?.language || config.language || answers.language,
@@ -211,17 +206,14 @@ export async function createCommand(projectName?: string, options?: any): Promis
       installDeps: options?.install !== undefined ? options.install : (config.installDeps !== undefined ? config.installDeps : answers.installDeps)
     };
 
-    // Create project directory (supports custom path) with confirmations
     let projectPath: string;
     if ((answers as any).useCustomPath && (answers as any).customPath) {
-      // Resolve input path
       const raw = String((answers as any).customPath).trim();
       const expanded = raw.replace(/^~(?=$|[\\/])/, os.homedir());
       let resolvedBase = path.isAbsolute(expanded)
         ? expanded
         : path.resolve(process.cwd(), expanded);
 
-      // Loop until we have a valid base directory decision
       while (true) {
         const exists = await fs.pathExists(resolvedBase);
         if (exists) {
@@ -240,7 +232,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
               : path.resolve(process.cwd(), retry.newPath);
             continue;
           }
-          // Confirm final target
           const target = path.join(resolvedBase, projectOptions.name);
           const confirm = await inquirer.prompt([
             {
@@ -319,7 +310,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
       projectPath = path.join(process.cwd(), projectOptions.name);
     }
     
-    // Check if directory exists
     if (await fs.pathExists(projectPath)) {
       const overwrite = await inquirer.prompt([
         {
@@ -338,16 +328,13 @@ export async function createCommand(projectName?: string, options?: any): Promis
       await fs.remove(projectPath);
     }
 
-    // Create directory
     await fs.ensureDir(projectPath);
     console.log(chalk.green(`\n✔ Created project directory: ${projectOptions.name}`));
 
-    // Generate project files
     const spinner = makeSpinner('🔥 Generating project files...').start();
     await generateProject(projectPath, projectOptions);
     spinner.succeed(chalk.green('Project files generated'));
 
-    // Initialize Git
     if (projectOptions.git) {
       const gitSpinner = makeSpinner('🔀 Initializing Git repository...').start();
       const git = simpleGit(projectPath);
@@ -357,7 +344,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
       gitSpinner.succeed(chalk.green('Git repository initialized'));
     }
 
-    // Install dependencies
     if (projectOptions.installDeps && ['javascript', 'typescript'].includes(projectOptions.language)) {
       const installSpinner = makeSpinner(`📦 Installing dependencies with ${projectOptions.packageManager}...`).start();
       
@@ -371,18 +357,13 @@ export async function createCommand(projectName?: string, options?: any): Promis
       installSpinner.succeed(chalk.green('Dependencies installed'));
     }
 
-    // Create remote repository (if requested)
     if (projectOptions.remoteRepo) {
       const remoteSpinner = makeSpinner('🌐 Creating GitHub repository...').start();
       try {
-        // Ensure gh is installed
         execSync('gh --version', { stdio: 'ignore' });
-        // Ensure user is authenticated
         execSync('gh auth status -h github.com', { stdio: 'ignore' });
 
         const safeName = projectOptions.name.toLowerCase().replace(/[^a-z0-9-_]/g, '-');
-        // Create repo under the authenticated user/org and push current branch
-        // --source uses the projectPath, --remote sets origin, --push pushes HEAD
         execSync(`gh repo create ${safeName} --public --source="${projectPath}" --remote=origin --push`, {
           stdio: 'ignore'
         });
@@ -401,7 +382,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
       }
     }
 
-    // Open in VS Code
     if (projectOptions.openInVSCode) {
       try {
         execSync(`code ${projectPath}`, { stdio: 'ignore' });
@@ -411,7 +391,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
       }
     }
 
-    // Success message
     const nextSteps: string[] = [
       chalk.gray(`cd ${projectPath}`)
     ];
