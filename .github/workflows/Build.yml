@@ -7,7 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  Build:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +17,6 @@ jobs:
           node-version: 20
           cache: npm
 
-      # Use npm ci only if lockfile exists, else fallback to install
       - name: Install deps
         run: |
           if [ -f package-lock.json ]; then
@@ -25,9 +25,11 @@ jobs:
             npm install
           fi
 
-      # Build must exist in package.json
-      - run: npm run build
+      - name: Build project
+        run: npm run build
 
-      # These are optional; they won’t fail if missing
-      - run: npm run lint --if-present
-      - run: npm test --if-present
+      - name: Lint (optional)
+        run: npm run lint --if-present
+
+      - name: Test (optional)
+        run: npm test --if-present
