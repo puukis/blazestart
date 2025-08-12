@@ -17,7 +17,6 @@ import {
 
 export async function configCommand(action?: string, options?: any): Promise<void> {
   try {
-    // Quick path: --setprofile to set or clear defaultProfile
     if (options?.setprofile !== undefined) {
       const profileArg = String(options.setprofile).trim();
       const config = await getConfig();
@@ -41,7 +40,6 @@ export async function configCommand(action?: string, options?: any): Promise<voi
 
     const act = (action || '').toLowerCase();
     if (!act) {
-      // No action provided and no --setprofile handled above
       showConfigHelp();
       return;
     }

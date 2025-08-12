@@ -39,7 +39,6 @@ export async function createCommand(projectName?: string, options?: any): Promis
           config = await loadProfile(appConfig.defaultProfile);
           console.log(chalk.cyan(`📋 Loaded default profile: ${appConfig.defaultProfile}`));
         } else {
-          // No default profile set; offer to pick one if any exist
           const profiles = await listProfiles();
           if (profiles.length > 0) {
             const choice = await inquirer.prompt([
