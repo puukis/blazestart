@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![CI](https://github.com/puukis/blazestart/actions/workflows/Build.yml/badge.svg)](https://github.com/puukis/blazestart/actions/workflows/Build.yml)
 
 ## 🚀 What is BlazeStart?
 
