@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { simpleGit } from 'simple-git';
 import { execSync } from 'child_process';
 import { generateProject } from '../utils/generator';
-import { getConfig, loadProfile } from '../utils/config';
+import { getConfig, loadProfile, listProfiles } from '../utils/config';
 import { LANGUAGES, FRAMEWORKS, LICENSES, PACKAGE_MANAGERS } from '../config/templates';
 import { makeSpinner, boxed, logSuccess } from '../utils/ui';
 
@@ -38,6 +38,27 @@ export async function createCommand(projectName?: string, options?: any): Promis
         if (appConfig.defaultProfile) {
           config = await loadProfile(appConfig.defaultProfile);
           console.log(chalk.cyan(`📋 Loaded default profile: ${appConfig.defaultProfile}`));
+        } else {
+          // No default profile set; offer to pick one if any exist
+          const profiles = await listProfiles();
+          if (profiles.length > 0) {
+            const choice = await inquirer.prompt([
+              {
+                type: 'list',
+                name: 'pick',
+                message: 'Select a profile to apply (or choose None):',
+                choices: [
+                  { name: '⚡ None (do not apply a profile)', value: '__none__' },
+                  ...profiles.map(p => ({ name: p, value: p }))
+                ],
+                default: '__none__'
+              }
+            ]);
+            if (choice.pick !== '__none__') {
+              config = await loadProfile(choice.pick);
+              console.log(chalk.cyan(`📋 Loaded profile: ${choice.pick}`));
+            }
+          }
         }
       } catch {
 

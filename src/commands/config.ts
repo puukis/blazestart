@@ -15,9 +15,38 @@ import {
   importProfile
 } from '../utils/config';
 
-export async function configCommand(action: string, options?: any): Promise<void> {
+export async function configCommand(action?: string, options?: any): Promise<void> {
   try {
-    switch (action.toLowerCase()) {
+    // Quick path: --setprofile to set or clear defaultProfile
+    if (options?.setprofile !== undefined) {
+      const profileArg = String(options.setprofile).trim();
+      const config = await getConfig();
+      if (profileArg.toLowerCase() === 'none' || profileArg === '') {
+        delete (config as any).defaultProfile;
+        await saveConfig(config);
+        console.log(chalk.yellow('⭐ Default profile cleared.')); 
+      } else {
+        const profiles = await listProfiles();
+        if (!profiles.includes(profileArg)) {
+          console.log(chalk.red(`Profile "${profileArg}" not found.`));
+          console.log(chalk.dim('Use `blazestart config list` to see available profiles.'));
+          return;
+        }
+        (config as any).defaultProfile = profileArg;
+        await saveConfig(config);
+        console.log(chalk.green(`⭐ Default profile set to: ${profileArg}`));
+      }
+      return;
+    }
+
+    const act = (action || '').toLowerCase();
+    if (!act) {
+      // No action provided and no --setprofile handled above
+      showConfigHelp();
+      return;
+    }
+
+    switch (act) {
       case 'list':
       case 'ls':
         await listConfigProfiles();

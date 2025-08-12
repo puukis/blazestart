@@ -9,7 +9,7 @@ import { execSync } from 'child_process';
 import { generateProject } from '../utils/generator';
 import { LANGUAGES, FRAMEWORKS, LICENSES, PACKAGE_MANAGERS } from '../config/templates';
 import { boxed } from '../utils/ui';
-import { getConfig, loadProfile } from '../utils/config';
+import { getConfig, loadProfile, listProfiles } from '../utils/config';
 
 export async function initCommand(options?: any): Promise<void> {
   try {
@@ -44,6 +44,26 @@ export async function initCommand(options?: any): Promise<void> {
       if (appConfig.defaultProfile) {
         profile = await loadProfile(appConfig.defaultProfile);
         console.log(chalk.cyan(`📋 Loaded default profile: ${appConfig.defaultProfile}`));
+      } else {
+        const profiles = await listProfiles();
+        if (profiles.length > 0) {
+          const choice = await inquirer.prompt([
+            {
+              type: 'list',
+              name: 'pick',
+              message: 'Select a profile to apply (or choose None):',
+              choices: [
+                { name: '⚡ None (do not apply a profile)', value: '__none__' },
+                ...profiles.map(p => ({ name: p, value: p }))
+              ],
+              default: '__none__'
+            }
+          ]);
+          if (choice.pick !== '__none__') {
+            profile = await loadProfile(choice.pick);
+            console.log(chalk.cyan(`📋 Loaded profile: ${choice.pick}`));
+          }
+        }
       }
     } catch {
 

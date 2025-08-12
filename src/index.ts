@@ -52,10 +52,11 @@ program
   .action(initCommand);
 
 program
-  .command('config <action>')
+  .command('config [action]')
   .description('Manage saved configuration profiles')
   .option('-n, --name <name>', 'Profile name')
   .option('-s, --set <key=value>', 'Set a configuration value')
+  .option('-p, --setprofile <profile>', 'Set default profile (use "none" to clear)')
   .action(configCommand);
 
 program
