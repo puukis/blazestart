@@ -15,7 +15,19 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+
+      # Use npm ci only if lockfile exists, else fallback to install
+      - name: Install deps
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      # Build must exist in package.json
       - run: npm run build
+
+      # These are optional; they won’t fail if missing
       - run: npm run lint --if-present
       - run: npm test --if-present
