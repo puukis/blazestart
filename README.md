@@ -26,7 +26,7 @@ BlazeStart is a lightning-fast, intelligent project scaffolding CLI that elimina
 ### Local Development
 
 ```bash
-git clone https://github.com/yourusername/blazestart.git
+git clone https://github.com/puukis/blazestart.git
 cd blazestart
 ```
 
