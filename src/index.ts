@@ -69,6 +69,15 @@ program
   });
 
 program
+  .command('menu')
+  .description('Open the interactive menu')
+  .action(async () => {
+    await showSplashScreen();
+    const { interactiveMenu } = await import('./commands/menu');
+    await interactiveMenu(version);
+  });
+
+program
   .command('fork <repo-url>')
   .description('Fork and customize an existing repository')
   .option('-n, --name <name>', 'New project name')
@@ -78,10 +87,12 @@ program
     await forkCommand(repoUrl, options);
   });
 
-program.parse(process.argv);
-
 if (!process.argv.slice(2).length) {
-  showSplashScreen().then(() => {
-    program.outputHelp();
-  });
+  (async () => {
+    await showSplashScreen();
+    const { interactiveMenu } = await import('./commands/menu');
+    await interactiveMenu(version);
+  })();
+} else {
+  program.parse(process.argv);
 }
